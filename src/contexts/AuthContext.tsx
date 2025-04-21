@@ -11,6 +11,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../services/firebase';
 
+
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;

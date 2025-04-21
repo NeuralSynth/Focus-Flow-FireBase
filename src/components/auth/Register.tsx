@@ -26,10 +26,10 @@ const Register: React.FC = () => {
       setLoading(true);
       await signup(email, password);
       navigate('/dashboard');
-    } catch (err: any) {
-      if (err.code === 'auth/email-already-in-use') {
+    } catch (err: unknown) {
+      if ((err as { code: string }).code === 'auth/email-already-in-use') {
         setError('Email is already in use');
-      } else if (err.code === 'auth/weak-password') {
+      } else if ((err as { code: string }).code === 'auth/weak-password') {
         setError('Password should be at least 6 characters');
       } else {
         setError('Failed to create an account');
@@ -46,7 +46,7 @@ const Register: React.FC = () => {
       setLoading(true);
       await loginWithGoogle();
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('Google sign-in failed');
       console.error('[Google Sign-In Error]', err);
     } finally {
