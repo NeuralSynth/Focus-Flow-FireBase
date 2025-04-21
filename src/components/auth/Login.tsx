@@ -10,7 +10,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, googleSignIn } = useAuth();
+  const { login, loginWithGoogle } = useAuth(); // Ensure googleSignIn exists in AuthContextType
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,7 +33,7 @@ const Login: React.FC = () => {
     try {
       setError('');
       setLoading(true);
-      await googleSignIn();
+      await loginWithGoogle();
       navigate('/dashboard');
     } catch (err) {
       setError('Google sign-in failed. Please try again.');

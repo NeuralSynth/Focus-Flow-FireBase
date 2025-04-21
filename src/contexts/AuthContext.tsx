@@ -1,14 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { 
-  User, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
+import {
+  User,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
   onAuthStateChanged,
-  sendPasswordResetEmail 
+  sendPasswordResetEmail,
+  signInWithPopup,
+  GoogleAuthProvider,
 } from 'firebase/auth';
 import { auth } from '../services/firebase';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -17,15 +18,10 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
-  googleSignIn: () => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
-
-const googleSignIn = async () => { // ✅ added
-  const provider = new GoogleAuthProvider();
-  await signInWithPopup(auth, provider);
-};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -38,6 +34,8 @@ export const useAuth = () => {
 interface AuthProviderProps {
   children: ReactNode;
 }
+
+// Removed redundant declaration of AuthContextType
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -59,6 +57,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     await sendPasswordResetEmail(auth, email);
   };
 
+  const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      // currentUser will be updated automatically by onAuthStateChanged
+    } catch (error) {
+      console.error('Google Sign-In error:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
@@ -75,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     resetPassword,
-    googleSignIn
+    loginWithGoogle,
   };
 
   return (
