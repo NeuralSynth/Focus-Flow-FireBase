@@ -5,9 +5,10 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  sendPasswordResetEmail
+  sendPasswordResetEmail 
 } from 'firebase/auth';
 import { auth } from '../services/firebase';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -16,9 +17,15 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  googleSignIn: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+
+const googleSignIn = async () => { // ✅ added
+  const provider = new GoogleAuthProvider();
+  await signInWithPopup(auth, provider);
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -68,6 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     resetPassword,
+    googleSignIn
   };
 
   return (
