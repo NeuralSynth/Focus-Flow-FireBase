@@ -3,13 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { ArrowRight, Lock, Mail } from 'lucide-react';
+// Removed from the top level and moved inside the Login component
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth(); // Ensure googleSignIn exists in AuthContextType
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,6 +28,21 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      await loginWithGoogle();
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Google sign-in failed. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
@@ -110,6 +126,21 @@ const Login: React.FC = () => {
               </Link>
             </div>
           </div>
+
+          <div className="relative mt-4">
+            <button type="button"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="group w-full flex justify-center items-center py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white text-gray-700 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-100 hover:dark:bg-gray-600 transition disabled:opacity-50"
+            >
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              alt="Google logo"
+              className="w-5 h-5 mr-3"
+            />
+            Sign in with Google
+            </button>
+          </div>
+
 
           <div>
             <motion.button
